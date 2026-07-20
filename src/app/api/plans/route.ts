@@ -1,5 +1,6 @@
 ﻿import { NextResponse } from "next/server";
 
+import { compileContextPackages } from "@/features/context/compiler";
 import { createProjectPlan } from "@/features/planning/service";
 import { planRequestSchema } from "@/features/planning/schema";
 
@@ -19,7 +20,12 @@ export async function POST(request: Request) {
 
   try {
     const plan = await createProjectPlan(parsed.data);
-    return NextResponse.json({ plan });
+    const contextPackages = compileContextPackages(plan);
+
+    return NextResponse.json({
+      plan,
+      contextPackages,
+    });
   } catch (error) {
     console.error("Failed to create project plan.", error);
 
