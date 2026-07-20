@@ -1,4 +1,4 @@
-﻿import {
+import {
   ArrowsClockwiseIcon,
   GitBranchIcon,
   GitPullRequestIcon,
@@ -7,6 +7,8 @@
   RobotIcon,
   SquaresFourIcon,
 } from "@phosphor-icons/react/ssr";
+
+import { ProjectPlanner } from "@/features/planning/components/project-planner";
 
 const navigation = [
   { label: "Overview", icon: HouseIcon, active: true },
@@ -120,16 +122,7 @@ export function AppShell() {
           </div>
         </section>
 
-        <section className="empty-projects">
-          <div className="empty-icon">
-            <GitBranchIcon size={25} />
-          </div>
-          <h3>No active projects yet</h3>
-          <p>
-            Connect a repository and describe what you want to build.
-            BranchMind will organize the rest.
-          </p>
-        </section>
+        <ProjectPlanner />
       </main>
     </div>
   );
