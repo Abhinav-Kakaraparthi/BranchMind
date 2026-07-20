@@ -1,4 +1,4 @@
-﻿.app-shell {
+.app-shell {
   display: grid;
   min-height: 100vh;
   grid-template-columns: 248px minmax(0, 1fr);
@@ -440,4 +440,9 @@ body {
 .hero-copy > p,
 .empty-projects p {
   letter-spacing: -0.01em;
+}
+
+.new-project-button,
+.primary-button {
+  text-decoration: none;
 }
