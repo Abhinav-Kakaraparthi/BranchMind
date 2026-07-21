@@ -1,0 +1,89 @@
+.workspace-launch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 18px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: #f8fbfc;
+}
+
+.workspace-launch.complete {
+  border-color: #b9e4d1;
+  background: var(--success-soft);
+}
+
+.workspace-launch-label,
+.workspace-branch-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.workspace-launch-label {
+  color: var(--brand-dark);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.workspace-launch.complete .workspace-launch-label {
+  color: var(--success);
+}
+
+.workspace-launch p {
+  margin: 5px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.workspace-branch-name {
+  margin-top: 6px;
+  color: var(--text);
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.workspace-launch button {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 13px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--sidebar);
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.workspace-launch button:hover:not(:disabled) {
+  background: var(--brand-dark);
+}
+
+.workspace-launch button:disabled {
+  cursor: default;
+  opacity: 0.76;
+}
+
+.workspace-launch-error {
+  flex-basis: 100%;
+  align-items: center;
+  color: #a33c3c !important;
+}
+
+@media (max-width: 580px) {
+  .workspace-launch {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .workspace-launch button {
+    width: 100%;
+  }
+}

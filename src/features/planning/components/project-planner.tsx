@@ -137,6 +137,7 @@ export function ProjectPlanner() {
         <PlanResults
           contextPackages={result.contextPackages}
           plan={result.plan}
+          repository={repository.trim()}
         />
       ) : null}
     </section>
