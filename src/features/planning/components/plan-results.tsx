@@ -11,15 +11,18 @@ import {
 
 import type { ContextPackage } from "@/features/context/compiler";
 import type { ProjectPlan } from "@/features/planning/schema";
+import { WorkspaceLaunch } from "@/features/workspaces/workspace-launch";
 
 type PlanResultsProps = {
   plan: ProjectPlan;
   contextPackages: ContextPackage[];
+  repository: string;
 };
 
 export function PlanResults({
   plan,
   contextPackages,
+  repository,
 }: PlanResultsProps) {
   const [selectedKey, setSelectedKey] = useState(
     plan.workstreams[0].key,
@@ -180,6 +183,16 @@ export function PlanResults({
               </div>
             </div>
           ) : null}
+
+          <WorkspaceLaunch
+            key={selectedWorkstream.key}
+            repository={repository}
+            workstream={{
+              key: selectedWorkstream.key,
+              name: selectedWorkstream.name,
+            }}
+          />
+
         </article>
       </div>
     </div>
