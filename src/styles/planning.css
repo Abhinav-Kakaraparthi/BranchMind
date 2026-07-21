@@ -156,7 +156,14 @@
 }
 
 .plan-results {
+  scroll-margin-top: 24px;
   margin-top: 26px;
+}
+
+.planner-actions button:focus-visible,
+.workstream-row:focus-visible {
+  outline: 3px solid rgba(80, 136, 152, 0.55);
+  outline-offset: 2px;
 }
 
 .results-header {
@@ -463,4 +470,5 @@
   .context-receipt {
     grid-template-columns: 1fr;
   }
+
 }

@@ -1,14 +1,16 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import {
-  GitBranchIcon,
-  SpinnerGapIcon,
-  WarningCircleIcon,
-} from "@phosphor-icons/react";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { GitBranchIcon, SpinnerGapIcon, WarningCircleIcon } from "@phosphor-icons/react";
 
 import type { ContextPackage } from "@/features/context/compiler";
 import type { ProjectPlan } from "@/features/planning/schema";
+import {
+  navigationEventName,
+  projectIntakeId,
+  scrollToNavigationTarget,
+  type NavigationRequest,
+} from "@/features/planning/navigation";
 
 import { PlanResults } from "./plan-results";
 
@@ -25,6 +27,29 @@ export function ProjectPlanner() {
   const [result, setResult] = useState<PlanningResponse>();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const productGoalRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    function handleNavigation(event: Event) {
+      const request = (event as CustomEvent<NavigationRequest>).detail;
+
+      if (!request) return;
+
+      if (request.intent === "new-project") {
+        setResult(undefined);
+        setError("");
+      }
+
+      scrollToNavigationTarget(request.target);
+
+      if (request.intent === "new-project" || request.intent === "start-project") {
+        productGoalRef.current?.focus({ preventScroll: true });
+      }
+    }
+
+    window.addEventListener(navigationEventName, handleNavigation);
+    return () => window.removeEventListener(navigationEventName, handleNavigation);
+  }, []);
 
   async function submitPlan(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -75,7 +100,7 @@ export function ProjectPlanner() {
   }
 
   return (
-    <section className="planner" id="planner">
+    <section className="planner" id="project-intake">
       <div className="planner-heading">
         <div>
           <span className="section-label">Project intake</span>
@@ -102,8 +127,10 @@ export function ProjectPlanner() {
           Product goal
           <textarea
             aria-label="Product goal"
+            id="product-goal"
             onChange={(event) => setGoal(event.target.value)}
             placeholder="Describe what you want to build, the audience, and the result that must work."
+            ref={productGoalRef}
             rows={5}
             value={goal}
           />
@@ -139,7 +166,44 @@ export function ProjectPlanner() {
           plan={result.plan}
           repository={repository.trim()}
         />
-      ) : null}
+      ) : (
+        <EmptyPlanningSections />
+      )}
     </section>
+  );
+}
+
+const emptySections = [
+  {
+    id: "generated-workstreams",
+    title: "No generated workstreams yet",
+    description: "Create a project plan to generate workstreams from your product goal.",
+  },
+  {
+    id: "agent-team",
+    title: "No agent team yet",
+    description: "Create a project plan before BranchMind can assemble a team to execute it.",
+  },
+  {
+    id: "pull-request-results",
+    title: "No pull request results yet",
+    description: "Create a project plan before there are execution results to review.",
+  },
+] as const;
+
+function EmptyPlanningSections() {
+  return (
+    <div className="empty-navigation-sections">
+      {emptySections.map(({ id, title, description }) => (
+        <section className="empty-navigation-section" id={id} key={id}>
+          <div>
+            <span className="section-label">{id.replaceAll("-", " ")}</span>
+            <h3>{title}</h3>
+            <p>{description}</p>
+          </div>
+          <a href={`#${projectIntakeId}`}>Go to project intake</a>
+        </section>
+      ))}
+    </div>
   );
 }

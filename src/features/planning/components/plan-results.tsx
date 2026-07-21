@@ -10,6 +10,7 @@ import {
 } from "@phosphor-icons/react";
 
 import type { ContextPackage } from "@/features/context/compiler";
+import { TeamExecutionPanel } from "@/features/execution/team-execution-panel";
 import type { ProjectPlan } from "@/features/planning/schema";
 import { WorkspaceLaunch } from "@/features/workspaces/workspace-launch";
 
@@ -58,7 +59,7 @@ export function PlanResults({
   }, [contextPackages]);
 
   return (
-    <div className="plan-results">
+    <div className="plan-results" id="generated-workstreams">
       <div className="results-header">
         <div>
           <span className="section-label">Generated project system</span>
@@ -88,6 +89,12 @@ export function PlanResults({
           value={metrics.totalAvoided.toLocaleString()}
         />
       </div>
+
+      <TeamExecutionPanel
+        contextPackages={contextPackages}
+        plan={plan}
+        repository={repository}
+      />
 
       <div className="workstream-layout">
         <div className="workstream-list">
@@ -152,7 +159,7 @@ export function PlanResults({
             <span>
               {selectedWorkstream.dependsOn.length
                 ? selectedWorkstream.dependsOn.join(", ")
-                : "None â€” ready for parallel execution"}
+                : "None - ready for parallel execution"}
             </span>
           </div>
 

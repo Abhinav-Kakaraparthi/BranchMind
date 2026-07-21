@@ -1,3 +1,6 @@
+"use client";
+
+import { MouseEvent } from "react";
 import {
   ArrowsClockwiseIcon,
   GitBranchIcon,
@@ -9,15 +12,34 @@ import {
 } from "@phosphor-icons/react/ssr";
 
 import { ProjectPlanner } from "@/features/planning/components/project-planner";
+import {
+  dispatchNavigation,
+  resolveNavigationTarget,
+  type NavigationControl,
+  type NavigationTarget,
+} from "@/features/planning/navigation";
 
-const navigation = [
-  { label: "Overview", icon: HouseIcon, active: true },
-  { label: "Workstreams", icon: GitBranchIcon },
-  { label: "Pull requests", icon: GitPullRequestIcon },
-  { label: "Agents", icon: RobotIcon },
+const navigation: {
+  label: string;
+  icon: typeof HouseIcon;
+  control: NavigationControl;
+}[] = [
+  { label: "Overview", icon: HouseIcon, control: "overview" },
+  { label: "Workstreams", icon: GitBranchIcon, control: "workstreams" },
+  { label: "Pull requests", icon: GitPullRequestIcon, control: "pull-requests" },
+  { label: "Agents", icon: RobotIcon, control: "agents" },
 ];
 
 export function AppShell() {
+  function navigate(
+    event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
+    intent: "navigate" | "new-project" | "start-project",
+    target: NavigationTarget,
+  ) {
+    event.preventDefault();
+    dispatchNavigation({ intent, target });
+  }
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -28,23 +50,32 @@ export function AppShell() {
           <span>BranchMind</span>
         </div>
 
-        <button className="new-project-button" type="button">
+        <button
+          className="new-project-button"
+          onClick={(event) => navigate(event, "new-project", "project-intake")}
+          type="button"
+        >
           <PlusIcon size={16} weight="bold" />
           New project
         </button>
 
         <nav className="navigation" aria-label="Primary navigation">
           <p className="navigation-label">Workspace</p>
-          {navigation.map(({ label, icon: Icon, active }) => (
-            <button
-              className={`navigation-item${active ? " active" : ""}`}
-              key={label}
-              type="button"
-            >
-              <Icon size={18} weight={active ? "fill" : "regular"} />
-              {label}
-            </button>
-          ))}
+          {navigation.map(({ label, icon: Icon, control }) => {
+            const target = resolveNavigationTarget(control);
+
+            return (
+              <a
+                className={`navigation-item${control === "overview" ? " active" : ""}`}
+                href={`#${target}`}
+                key={label}
+                onClick={(event) => navigate(event, "navigate", target)}
+              >
+                <Icon size={18} weight={control === "overview" ? "fill" : "regular"} />
+                {label}
+              </a>
+            );
+          })}
         </nav>
 
         <div className="sidebar-footer">
@@ -75,7 +106,7 @@ export function AppShell() {
           </div>
         </header>
 
-        <section className="hero">
+        <section className="hero" id="overview">
           <div className="hero-copy">
             <span className="hero-badge">
               <SquaresFourIcon size={15} weight="fill" />
@@ -87,7 +118,11 @@ export function AppShell() {
               workstreams, and brings verified changes back through pull
               requests.
             </p>
-            <button className="primary-button" type="button">
+            <button
+              className="primary-button"
+              onClick={(event) => navigate(event, "start-project", "project-intake")}
+              type="button"
+            >
               <PlusIcon size={17} weight="bold" />
               Start a project
             </button>
@@ -103,21 +138,9 @@ export function AppShell() {
             </div>
 
             <div className="workflow-list">
-              <WorkflowStep
-                label="Understand the goal"
-                detail="Orchestrator"
-                state="complete"
-              />
-              <WorkflowStep
-                label="Create focused workstreams"
-                detail="Specialist agents"
-                state="active"
-              />
-              <WorkflowStep
-                label="Review and integrate"
-                detail="Quality gate"
-                state="waiting"
-              />
+              <WorkflowStep label="Understand the goal" detail="Orchestrator" state="complete" />
+              <WorkflowStep label="Create focused workstreams" detail="Specialist agents" state="active" />
+              <WorkflowStep label="Review and integrate" detail="Quality gate" state="waiting" />
             </div>
           </div>
         </section>
