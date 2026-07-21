@@ -14,6 +14,10 @@ import {
 } from "./git-worktree";
 import type { ExecutionRequest } from "./schema";
 import { runGitHubCli } from "../workspaces/github-cli";
+import type {
+  ExecutionEventInput,
+  ExecutionEventStore,
+} from "./execution-events";
 
 export type ExecutionStage =
   | "preparing"
@@ -27,6 +31,11 @@ export type ExecutionEvent = {
   stage: ExecutionStage;
   status: "completed";
   timestamp: string;
+};
+
+export type ExecutionEventContext = {
+  teamRunId: string;
+  store: ExecutionEventStore;
 };
 
 export type ExecutionResult = {
@@ -79,6 +88,7 @@ const defaultDependencies: ExecutionDependencies = {
 export async function executeWorkstream(
   request: ExecutionRequest,
   dependencies: ExecutionDependencies = defaultDependencies,
+  eventContext?: ExecutionEventContext,
 ): Promise<ExecutionResult> {
   await dependencies.verifyRepository(request.repository);
 
@@ -86,11 +96,25 @@ export async function executeWorkstream(
   const events: ExecutionEvent[] = [];
 
   function record(stage: ExecutionStage) {
+    const timestamp = dependencies.now();
+
     events.push({
       stage,
       status: "completed",
-      timestamp: dependencies.now(),
+      timestamp,
     });
+
+    if (eventContext) {
+      const event: ExecutionEventInput = {
+        stage,
+        status: "completed",
+        timestamp,
+        branchName: request.branchName,
+        workstreamKey: request.workstream.key,
+      };
+
+      eventContext.store.record(eventContext.teamRunId, event);
+    }
   }
 
   record("preparing");

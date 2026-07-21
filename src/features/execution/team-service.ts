@@ -1,4 +1,10 @@
+import { randomUUID } from "node:crypto";
+
 import { provisionWorkspace } from "../workspaces/service";
+import {
+  executionEventStore,
+  type ExecutionEventStore,
+} from "./execution-events";
 import {
   scheduleAgentTeam,
   type TeamEvent,
@@ -11,6 +17,7 @@ import {
 import type { TeamExecutionRequest } from "./team-schema";
 
 export type TeamExecutionResult = {
+  teamRunId: string;
   repository: string;
   baseBranch: string;
   concurrency: number;
@@ -23,12 +30,32 @@ export type TeamExecutionResult = {
   events: TeamEvent[];
 };
 
+export type TeamExecutionDependencies = {
+  provisionWorkspace: typeof provisionWorkspace;
+  executeWorkstream: typeof executeWorkstream;
+  scheduleAgentTeam: typeof scheduleAgentTeam;
+  eventStore: ExecutionEventStore;
+  createTeamRunId: () => string;
+  now: () => string;
+};
+
+const defaultDependencies: TeamExecutionDependencies = {
+  provisionWorkspace,
+  executeWorkstream,
+  scheduleAgentTeam,
+  eventStore: executionEventStore,
+  createTeamRunId: randomUUID,
+  now: () => new Date().toISOString(),
+};
+
 export async function executeAgentTeam(
   request: TeamExecutionRequest,
+  dependencies: TeamExecutionDependencies = defaultDependencies,
 ): Promise<TeamExecutionResult> {
   const [first] = request.executions;
+  const teamRunId = dependencies.createTeamRunId();
 
-  const workspace = await provisionWorkspace({
+  const workspace = await dependencies.provisionWorkspace({
     repository: first.repository,
     baseBranch: first.baseBranch,
     workstreams: request.executions.map((execution) => ({
@@ -44,7 +71,7 @@ export async function executeAgentTeam(
     ]),
   );
 
-  const team = await scheduleAgentTeam(
+  const team = await dependencies.scheduleAgentTeam(
     request.executions.map((execution) => ({
       key: execution.workstream.key,
       dependsOn:
@@ -61,14 +88,33 @@ export async function executeAgentTeam(
         );
       }
 
-      return executeWorkstream(execution);
+      return dependencies.executeWorkstream(
+        execution,
+        undefined,
+        { teamRunId, store: dependencies.eventStore },
+      );
     },
     {
       concurrency: request.concurrency,
+      now: dependencies.now,
+      onEvent: (event) => {
+        const execution = executionsByKey.get(event.key);
+
+        if (!execution) return;
+
+        dependencies.eventStore.record(teamRunId, {
+          stage: "scheduling",
+          status: event.status,
+          timestamp: event.timestamp,
+          branchName: execution.branchName,
+          workstreamKey: event.key,
+        });
+      },
     },
   );
 
   return {
+    teamRunId,
     repository: first.repository,
     baseBranch: first.baseBranch,
     concurrency: request.concurrency,

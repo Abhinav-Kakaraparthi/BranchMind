@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { executionRequestSchema } from "./schema";
+import { createExecutionEventStore } from "./execution-events";
 import {
   executeWorkstream,
   type ExecutionDependencies,
@@ -116,6 +117,30 @@ describe("executeWorkstream", () => {
     expect(dependencies.qualityGates).not.toHaveBeenCalled();
     expect(dependencies.commitAndPush).not.toHaveBeenCalled();
     expect(dependencies.openPullRequest).not.toHaveBeenCalled();
+  });
+
+  it("records each specialist stage with its branch and workstream", async () => {
+    const store = createExecutionEventStore();
+    const teamRunId = "d2719d17-6bc7-4cca-b1a2-a7b92b7f4278";
+
+    await executeWorkstream(request, createDependencies(), {
+      teamRunId,
+      store,
+    });
+
+    expect(store.listByTeamRun(teamRunId)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          teamRunId,
+          stage: "implementing",
+          status: "completed",
+          timestamp: "2026-07-21T06:00:00.000Z",
+          branchName: "agent/health-endpoint",
+          workstreamKey: "health-endpoint",
+        }),
+        expect.objectContaining({ stage: "completed" }),
+      ]),
+    );
   });
 
   it("does not run an agent for a different local repository", async () => {
