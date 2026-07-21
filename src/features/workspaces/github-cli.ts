@@ -88,18 +88,21 @@ export class GitHubCliAdapter {
 export function runGitHubCli(
   arguments_: readonly string[],
 ): Promise<GitHubCommandResult> {
-  const executable =
-    process.env.BRANCHMIND_GH_PATH ??
-    (process.platform === "win32"
-      ? "C:\\Program Files\\GitHub CLI\\gh.exe"
-      : "gh");
-
   return new Promise((resolve, reject) => {
-    const child = spawn(executable, arguments_, {
+    const options = {
       shell: false,
       windowsHide: true,
       env: process.env,
-    });
+    };
+
+    const child =
+      process.platform === "win32"
+        ? spawn(
+            "C:\\Program Files\\GitHub CLI\\gh.exe",
+            arguments_,
+            options,
+          )
+        : spawn("/usr/bin/env", ["gh", ...arguments_], options);
 
     let stdout = "";
     let stderr = "";
