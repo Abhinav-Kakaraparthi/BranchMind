@@ -139,6 +139,8 @@ Execution rules:
 - Do not implement excluded workstreams.
 - Do not run git commit, git push, gh, or create a pull request.
 - Do not modify secrets, authentication files, or environment files.
+- In your final summary, mention only repository-relative file paths.
+- Do not output absolute paths or Markdown links to local files.
 - Keep every source file below 500 lines.
 - Add or update focused tests for the behavior you implement.
 - Preserve existing architecture and avoid unnecessary dependencies.

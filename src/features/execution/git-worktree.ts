@@ -11,12 +11,34 @@ export type CommandResult = {
 type WorktreeRequest = {
   branchName: string;
   baseBranch: string;
+  dependencyBranches?: string[];
 };
 
 type QualityResult = {
   command: string;
   output: string;
 };
+
+let repositoryQueue = Promise.resolve();
+
+async function withRepositoryLock<T>(
+  operation: () => Promise<T>,
+): Promise<T> {
+  const previous = repositoryQueue;
+  let release!: () => void;
+
+  repositoryQueue = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+
+  await previous;
+
+  try {
+    return await operation();
+  } finally {
+    release();
+  }
+}
 
 export async function withAgentWorktree<T>(
   request: WorktreeRequest,
@@ -33,24 +55,42 @@ export async function withAgentWorktree<T>(
   let worktreeCreated = false;
 
   try {
-    await runGit(["fetch", "origin", "--prune"], repositoryDirectory);
+    await withRepositoryLock(async () => {
+      await runGit(
+        ["fetch", "origin", "--prune"],
+        repositoryDirectory,
+      );
 
-    await runGit(
-      [
-        "worktree",
-        "add",
-        "--detach",
-        workingDirectory,
-        `origin/${request.branchName}`,
-      ],
-      repositoryDirectory,
-    );
-    worktreeCreated = true;
+      await runGit(
+        [
+          "worktree",
+          "add",
+          "--detach",
+          workingDirectory,
+          `origin/${request.branchName}`,
+        ],
+        repositoryDirectory,
+      );
+      worktreeCreated = true;
+    });
 
     await runGit(
       ["merge", "--ff-only", `origin/${request.baseBranch}`],
       workingDirectory,
     );
+
+    for (const dependencyBranch of request.dependencyBranches ?? []) {
+      assertSafeGitRef(dependencyBranch);
+
+      await runGit(
+        [
+          "merge",
+          "--no-edit",
+          `origin/${dependencyBranch}`,
+        ],
+        workingDirectory,
+      );
+    }
 
     await runNpm(
       ["ci", "--ignore-scripts"],
@@ -60,9 +100,11 @@ export async function withAgentWorktree<T>(
     return await operation(workingDirectory);
   } finally {
     if (worktreeCreated) {
-      await runGit(
-        ["worktree", "remove", "--force", workingDirectory],
-        repositoryDirectory,
+      await withRepositoryLock(() =>
+        runGit(
+          ["worktree", "remove", "--force", workingDirectory],
+          repositoryDirectory,
+        ),
       ).catch(() => undefined);
     }
 

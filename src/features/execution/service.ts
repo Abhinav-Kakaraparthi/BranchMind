@@ -49,6 +49,7 @@ type WorktreeRunner = <T>(
   request: {
     branchName: string;
     baseBranch: string;
+    dependencyBranches?: string[];
   },
   operation: (workingDirectory: string) => Promise<T>,
 ) => Promise<T>;
@@ -98,6 +99,10 @@ export async function executeWorkstream(
     {
       branchName: request.branchName,
       baseBranch: request.baseBranch,
+      dependencyBranches:
+        request.contextPackage.dependencies.map(
+          (dependency) => `agent/${dependency.key}`,
+        ),
     },
     async (workingDirectory) => {
       record("implementing");
