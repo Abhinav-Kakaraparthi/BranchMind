@@ -1,8 +1,9 @@
 "use client";
 
-import { MouseEvent } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import {
   ArrowsClockwiseIcon,
+  ChartPieSliceIcon,
   GitBranchIcon,
   GitPullRequestIcon,
   HouseIcon,
@@ -14,8 +15,10 @@ import {
 import { ProjectPlanner } from "@/features/planning/components/project-planner";
 import {
   dispatchNavigation,
+  planningStateEventName,
   resolveNavigationTarget,
   type NavigationControl,
+  type NavigationState,
   type NavigationTarget,
 } from "@/features/planning/navigation";
 
@@ -28,9 +31,25 @@ const navigation: {
   { label: "Workstreams", icon: GitBranchIcon, control: "workstreams" },
   { label: "Pull requests", icon: GitPullRequestIcon, control: "pull-requests" },
   { label: "Agents", icon: RobotIcon, control: "agents" },
+  { label: "Contributions", icon: ChartPieSliceIcon, control: "contributions" },
 ];
 
 export function AppShell() {
+  const [planningState, setPlanningState] = useState<NavigationState>({
+    hasPlan: false,
+    hasTeamResults: false,
+  });
+
+  useEffect(() => {
+    function updatePlanningState(event: Event) {
+      const state = (event as CustomEvent<NavigationState>).detail;
+      if (state) setPlanningState(state);
+    }
+
+    window.addEventListener(planningStateEventName, updatePlanningState);
+    return () => window.removeEventListener(planningStateEventName, updatePlanningState);
+  }, []);
+
   function navigate(
     event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>,
     intent: "navigate" | "new-project" | "start-project",
@@ -62,7 +81,7 @@ export function AppShell() {
         <nav className="navigation" aria-label="Primary navigation">
           <p className="navigation-label">Workspace</p>
           {navigation.map(({ label, icon: Icon, control }) => {
-            const target = resolveNavigationTarget(control);
+            const target = resolveNavigationTarget(control, planningState);
 
             return (
               <a

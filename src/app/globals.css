@@ -2,6 +2,7 @@
 @import "../styles/shell.css";
 @import "../styles/planning.css";
 @import "../styles/workspaces.css";
+@import "../styles/contributions.css";
 
 :root {
   --background: #f4f7f8;

@@ -1,4 +1,6 @@
-﻿export const PLANNING_INSTRUCTIONS = `
+import type { PlanRequest } from "./schema";
+
+export const PLANNING_INSTRUCTIONS = `
 You are BranchMind's principal engineering planner.
 
 Convert a product goal into the smallest set of independently executable
@@ -18,4 +20,27 @@ Rules:
 - Every dependency must reference another returned workstream.
 - Avoid circular dependencies.
 - Preserve one coherent product architecture.
+- Treat every structured contributor idea supplied with the request as an input
+  that must be considered. Explain each included idea's influence through one
+  or more workstream objectives or deliverables.
+- Combine compatible ideas in shared workstreams where that produces a more
+  coherent outcome; do not make a separate workstream solely for attribution.
+- Preserve supplied contributor names and idea attribution exactly. Never
+  invent contributors, ideas, or attribution.
 `.trim();
+
+export function buildPlanningInput(request: PlanRequest): string {
+  const repository = request.repository
+    ? `Repository: ${request.repository}`
+    : "Repository: not connected yet";
+
+  return `${PLANNING_INSTRUCTIONS}
+
+${repository}
+
+Product goal:
+${request.goal}
+
+Structured contributor ideas to consider:
+${JSON.stringify(request.contributorIdeas, null, 2)}`;
+}

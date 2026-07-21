@@ -1,5 +1,14 @@
 ﻿import { z } from "zod";
 
+export const contributorIdeaSnapshotSchema = z.object({
+  ideaId: z.string().regex(/^idea-\d+$/),
+  contributorId: z.string().regex(/^human-\d+$/),
+  contributorName: z.string().trim().min(1).max(80),
+  title: z.string().trim().min(1).max(160),
+  detail: z.string().trim().min(1).max(4000),
+  status: z.enum(["proposed", "accepted", "blended"]),
+});
+
 export const planRequestSchema = z.object({
   goal: z
     .string()
@@ -7,6 +16,7 @@ export const planRequestSchema = z.object({
     .min(20, "Describe the product goal in at least 20 characters.")
     .max(4000, "Keep the product goal below 4,000 characters."),
   repository: z.string().trim().max(200).optional(),
+  contributorIdeas: z.array(contributorIdeaSnapshotSchema).max(100).default([]),
 });
 
 export const workstreamSchema = z.object({

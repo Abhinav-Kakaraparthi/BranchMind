@@ -13,6 +13,8 @@ import type { ContextPackage } from "@/features/context/compiler";
 import { TeamExecutionPanel } from "@/features/execution/team-execution-panel";
 import type { ProjectPlan } from "@/features/planning/schema";
 import { WorkspaceLaunch } from "@/features/workspaces/workspace-launch";
+import { ContributionLedger } from "@/features/contributions/contribution-ledger";
+import type { TeamExecutionResponse } from "@/features/execution/team-request";
 
 type PlanResultsProps = {
   plan: ProjectPlan;
@@ -28,6 +30,7 @@ export function PlanResults({
   const [selectedKey, setSelectedKey] = useState(
     plan.workstreams[0].key,
   );
+  const [team, setTeam] = useState<TeamExecutionResponse>();
 
   const selectedWorkstream =
     plan.workstreams.find((item) => item.key === selectedKey) ??
@@ -92,6 +95,7 @@ export function PlanResults({
 
       <TeamExecutionPanel
         contextPackages={contextPackages}
+        onTeamComplete={setTeam}
         plan={plan}
         repository={repository}
       />
@@ -203,6 +207,8 @@ export function PlanResults({
 
         </article>
       </div>
+
+      <ContributionLedger plan={plan} repository={repository} team={team} />
     </div>
   );
 }

@@ -22,6 +22,7 @@ type TeamExecutionPanelProps = {
   repository: string;
   plan: ProjectPlan;
   contextPackages: ContextPackage[];
+  onTeamComplete?: (team: TeamExecutionResponse) => void;
 };
 
 type TeamExecutionApiResponse = {
@@ -33,6 +34,7 @@ export function TeamExecutionPanel({
   repository,
   plan,
   contextPackages,
+  onTeamComplete,
 }: TeamExecutionPanelProps) {
   const [team, setTeam] = useState<TeamExecutionResponse>();
   const [error, setError] = useState("");
@@ -74,6 +76,7 @@ export function TeamExecutionPanel({
       }
 
       setTeam(data.team);
+      onTeamComplete?.(data.team);
     } catch (teamError) {
       setError(errorMessage(teamError));
     } finally {

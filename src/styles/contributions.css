@@ -1,0 +1,183 @@
+.contribution-ledger,
+.contributor-idea-board {
+  scroll-margin-top: 24px;
+  margin-top: 18px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: var(--surface);
+}
+
+.contributor-idea-board {
+  margin-top: 0;
+  margin-bottom: 18px;
+  padding: 18px;
+  background: var(--surface-subtle);
+}
+
+.contribution-heading,
+.credit-row > div,
+.ledger-events > p {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.contribution-heading h2 {
+  margin: 0;
+  font-family: var(--font-manrope), sans-serif;
+  font-size: 24px;
+  letter-spacing: -0.04em;
+}
+
+.contribution-heading p,
+.ledger-boundary,
+.rounding-note,
+.ledger-events > p {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.contribution-heading p { margin: 8px 0 0; }
+
+.ledger-persistence {
+  flex: none;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: #fff5dc;
+  color: #8b6219;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ledger-boundary {
+  margin: 16px 0 0;
+}
+
+.idea-intake-link {
+  display: inline-block;
+  margin-top: 11px;
+  color: var(--brand-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.idea-board-forms h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.idea-register {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: white;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.idea-register > strong,
+.idea-register small {
+  display: block;
+}
+
+.idea-register > strong { color: var(--text); }
+.idea-register p { margin: 7px 0 0; }
+.idea-register p span { color: var(--brand-dark); font-weight: 700; }
+.idea-register small { margin-top: 10px; line-height: 1.45; }
+
+.ledger-policy {
+  margin: 14px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.ledger-boundary code,
+.ledger-events code {
+  overflow-wrap: anywhere;
+  color: var(--brand-dark);
+}
+
+.credit-model {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--border);
+}
+
+.credit-model span {
+  padding: 11px;
+  background: var(--surface-subtle);
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.credit-model strong { display: block; margin-top: 3px; color: var(--text); font-size: 14px; }
+
+.ledger-credits {
+  margin-top: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.credit-row { padding: 14px 17px; border-top: 1px solid var(--border); }
+.credit-row:first-of-type { border-top: 0; }
+.credit-row strong { font-size: 13px; }
+.credit-row > div > span { color: var(--brand-dark); font-size: 18px; font-weight: 800; }
+.credit-row ul { display: grid; gap: 4px; margin: 8px 0 0; padding-left: 17px; color: var(--text-muted); font-size: 11px; line-height: 1.4; }
+.rounding-note { margin: 0; padding: 12px 17px; border-top: 1px solid var(--border); background: var(--surface-subtle); }
+
+.ledger-forms {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+  margin-top: 14px;
+}
+
+.ledger-forms form {
+  display: grid;
+  gap: 8px;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: #fbfdfd;
+}
+
+.ledger-forms h3,
+.ledger-events h3 { margin: 0 0 2px; font-size: 13px; }
+.ledger-forms input,
+.ledger-forms textarea,
+.ledger-forms select {
+  width: 100%;
+  padding: 9px;
+  border: 1px solid var(--border-strong);
+  border-radius: 7px;
+  background: white;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+}
+
+.ledger-forms textarea { resize: vertical; }
+.ledger-forms button { justify-self: start; padding: 8px 10px; border: 0; border-radius: 7px; background: var(--brand); color: white; cursor: pointer; font-size: 12px; font-weight: 700; }
+.ledger-forms button:disabled { cursor: not-allowed; opacity: .55; }
+.ledger-error { margin: 14px 0 0; color: #a33c3c; font-size: 12px; }
+.ledger-events { margin-top: 14px; padding: 15px; border-radius: 11px; background: var(--surface-subtle); }
+.ledger-events > p { justify-content: flex-start; align-items: center; margin: 7px 0; }
+.ledger-events > div { margin-top: 5px; color: var(--text-muted); font-size: 12px; }
+.ledger-events svg { vertical-align: text-bottom; color: var(--success); }
+
+@media (max-width: 720px) {
+  .contribution-heading { flex-direction: column; }
+  .credit-model, .ledger-forms { grid-template-columns: 1fr; }
+}

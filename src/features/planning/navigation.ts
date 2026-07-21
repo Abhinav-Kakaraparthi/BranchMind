@@ -5,13 +5,16 @@ export type NavigationTarget =
   | typeof projectIntakeId
   | "generated-workstreams"
   | "agent-team"
-  | "pull-request-results";
+  | "pull-request-results"
+  | "contributor-idea-board"
+  | "contribution-ledger";
 
 export type NavigationControl =
   | "overview"
   | "workstreams"
   | "agents"
-  | "pull-requests";
+  | "pull-requests"
+  | "contributions";
 
 export type NavigationState = {
   hasPlan: boolean;
@@ -28,6 +31,7 @@ export const planningStateEventName = "branchmind:planning-state";
 
 export function resolveNavigationTarget(
   control: NavigationControl,
+  state: NavigationState = { hasPlan: false, hasTeamResults: false },
 ): NavigationTarget {
   switch (control) {
     case "overview":
@@ -38,6 +42,8 @@ export function resolveNavigationTarget(
       return "agent-team";
     case "pull-requests":
       return "pull-request-results";
+    case "contributions":
+      return state.hasPlan ? "contribution-ledger" : "contributor-idea-board";
   }
 }
 

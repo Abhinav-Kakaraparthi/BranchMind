@@ -6,6 +6,7 @@ import { GitBranchIcon, SpinnerGapIcon, WarningCircleIcon } from "@phosphor-icon
 import type { ContextPackage } from "@/features/context/compiler";
 import type { ProjectPlan } from "@/features/planning/schema";
 import {
+  dispatchPlanningState,
   navigationEventName,
   projectIntakeId,
   scrollToNavigationTarget,
@@ -13,6 +14,9 @@ import {
 } from "@/features/planning/navigation";
 
 import { PlanResults } from "./plan-results";
+import { ContributorIdeaBoard } from "@/features/contributions/idea-board";
+import { createPlanningRequest } from "@/features/contributions/idea-snapshot";
+import { useContributionLedger } from "@/features/contributions/use-contribution-ledger";
 
 type PlanningResponse = {
   plan: ProjectPlan;
@@ -28,6 +32,7 @@ export function ProjectPlanner() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const productGoalRef = useRef<HTMLTextAreaElement>(null);
+  const { ledger } = useContributionLedger(repository);
 
   useEffect(() => {
     function handleNavigation(event: Event) {
@@ -51,6 +56,10 @@ export function ProjectPlanner() {
     return () => window.removeEventListener(navigationEventName, handleNavigation);
   }, []);
 
+  useEffect(() => {
+    dispatchPlanningState({ hasPlan: Boolean(result), hasTeamResults: false });
+  }, [result]);
+
   async function submitPlan(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -73,10 +82,7 @@ export function ProjectPlanner() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          repository: repository.trim(),
-          goal: goal.trim(),
-        }),
+        body: JSON.stringify(createPlanningRequest(repository, goal, ledger)),
       });
 
       const data = await response.json();
@@ -109,7 +115,7 @@ export function ProjectPlanner() {
         <span className="model-label">GPT-5.6 Terra</span>
       </div>
 
-      <form className="planner-form" onSubmit={submitPlan}>
+      <div className="planner-form">
         <label>
           GitHub repository
           <span className="input-shell">
@@ -123,6 +129,9 @@ export function ProjectPlanner() {
           </span>
         </label>
 
+        <ContributorIdeaBoard repository={repository} />
+
+        <form onSubmit={submitPlan}>
         <label>
           Product goal
           <textarea
@@ -158,7 +167,8 @@ export function ProjectPlanner() {
             {error}
           </p>
         ) : null}
-      </form>
+        </form>
+      </div>
 
       {result ? (
         <PlanResults

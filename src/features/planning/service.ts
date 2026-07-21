@@ -3,7 +3,7 @@
 import { runCodex } from "@/lib/codex";
 
 import { validatePlanGraph } from "./graph";
-import { PLANNING_INSTRUCTIONS } from "./prompt";
+import { buildPlanningInput } from "./prompt";
 import {
   projectPlanSchema,
   type PlanRequest,
@@ -24,17 +24,4 @@ export async function createProjectPlan(
   validatePlanGraph(plan);
 
   return plan;
-}
-
-function buildPlanningInput(request: PlanRequest): string {
-  const repository = request.repository
-    ? `Repository: ${request.repository}`
-    : "Repository: not connected yet";
-
-  return `${PLANNING_INSTRUCTIONS}
-
-${repository}
-
-Product goal:
-${request.goal}`;
 }
