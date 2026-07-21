@@ -1,4 +1,4 @@
-﻿import { spawn } from "node:child_process";
+import { spawn } from "node:child_process";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -73,7 +73,7 @@ export async function runCodex({
   }
 }
 
-function resolveCodexInvocation(): CodexInvocation {
+export function resolveCodexInvocation(): CodexInvocation {
   const configuredPath = process.env.CODEX_CLI_PATH;
 
   if (configuredPath) {
@@ -111,7 +111,7 @@ function resolveCodexInvocation(): CodexInvocation {
   };
 }
 
-async function executeProcess(
+export async function executeProcess(
   command: string,
   argumentsList: string[],
   input: string,
