@@ -152,7 +152,7 @@ export function PlanResults({
             <span>
               {selectedWorkstream.dependsOn.length
                 ? selectedWorkstream.dependsOn.join(", ")
-                : "None — ready for parallel execution"}
+                : "None â€” ready for parallel execution"}
             </span>
           </div>
 
@@ -187,6 +187,7 @@ export function PlanResults({
           <WorkspaceLaunch
             key={selectedWorkstream.key}
             repository={repository}
+            contextPackage={selectedContext}
             workstream={{
               key: selectedWorkstream.key,
               name: selectedWorkstream.name,
