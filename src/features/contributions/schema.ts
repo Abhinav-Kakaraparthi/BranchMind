@@ -80,13 +80,22 @@ export type Idea = z.infer<typeof ideaSchema>;
 export type ReviewEvidence = z.infer<typeof reviewEvidenceSchema>;
 export type IntegrationDecision = z.infer<typeof integrationDecisionSchema>;
 
-export const emptyContributionLedgerSnapshot: ContributionLedger = Object.freeze({
+const emptyContributionLedgerSnapshotValue: ContributionLedger = {
   version: 1,
-  contributors: Object.freeze([]) as ContributionLedger["contributors"],
-  ideas: Object.freeze([]) as ContributionLedger["ideas"],
-  reviews: Object.freeze([]) as ContributionLedger["reviews"],
-  decisions: Object.freeze([]) as ContributionLedger["decisions"],
-});
+  contributors: [],
+  ideas: [],
+  reviews: [],
+  decisions: [],
+};
+
+Object.freeze(emptyContributionLedgerSnapshotValue.contributors);
+Object.freeze(emptyContributionLedgerSnapshotValue.ideas);
+Object.freeze(emptyContributionLedgerSnapshotValue.reviews);
+Object.freeze(emptyContributionLedgerSnapshotValue.decisions);
+
+export const emptyContributionLedgerSnapshot: ContributionLedger = Object.freeze(
+  emptyContributionLedgerSnapshotValue,
+);
 
 export const emptyContributionLedger = (): ContributionLedger => ({
   version: 1,
