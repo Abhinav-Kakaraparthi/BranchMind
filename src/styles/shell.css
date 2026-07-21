@@ -79,6 +79,7 @@
   background: transparent;
   color: var(--sidebar-muted);
   cursor: pointer;
+  text-decoration: none;
   text-align: left;
 }
 
@@ -186,6 +187,7 @@
 
 .hero {
   display: grid;
+  scroll-margin-top: 24px;
   grid-template-columns: minmax(0, 1.3fr) minmax(330px, 0.7fr);
   gap: 32px;
   margin-top: 34px;
@@ -242,6 +244,13 @@
 
 .primary-button:hover {
   background: var(--brand-dark);
+}
+
+.new-project-button:focus-visible,
+.primary-button:focus-visible,
+.navigation-item:focus-visible {
+  outline: 3px solid #9fdae7;
+  outline-offset: 3px;
 }
 
 .workflow-preview {
@@ -393,6 +402,7 @@
   .workspace {
     padding: 28px 20px 40px;
   }
+
 }
 
 @media (max-width: 560px) {
